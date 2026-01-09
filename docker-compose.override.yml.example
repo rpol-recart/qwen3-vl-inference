@@ -1,0 +1,57 @@
+# docker-compose.override.yml.example
+#
+# This file provides examples of custom overrides for docker-compose.yml
+# Copy this to docker-compose.override.yml and customize for your needs
+# docker-compose.override.yml is automatically loaded by docker-compose
+
+version: '3.8'
+
+services:
+  qwen3-vl-server:
+    # Example 1: Use specific GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           device_ids: ['0']  # Use only GPU 0
+    #           capabilities: [gpu]
+
+    # Example 2: Mount local model directory
+    # volumes:
+    #   - /path/to/your/local/model:/models:ro
+
+    # Example 3: Custom environment variables
+    # environment:
+    #   - MODEL_PATH=/models/Qwen3-VL-235B-A22B-Instruct
+    #   - GPU_MEMORY_UTILIZATION=0.85
+    #   - TENSOR_PARALLEL_SIZE=2
+
+    # Example 4: Change exposed port
+    # ports:
+    #   - "9000:8000"
+
+    # Example 5: Add resource limits
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '16'
+    #       memory: 64G
+
+    # Example 6: Add custom network
+    # networks:
+    #   - custom-network
+    #   - qwen-network
+
+    # Example 7: Add health check override
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+    #   interval: 60s
+    #   timeout: 30s
+    #   retries: 5
+    #   start_period: 300s
+
+# Example custom network
+# networks:
+#   custom-network:
+#     external: true

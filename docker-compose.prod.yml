@@ -1,0 +1,78 @@
+version: '3.8'
+
+# Production override for docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  qwen3-vl-server:
+    # Production image
+    image: qwen3-vl-inference:prod
+    container_name: qwen3-vl-server-prod
+
+    # Production environment
+    environment:
+      - DEBUG=False
+      - LOG_LEVEL=INFO
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '16'
+          memory: 64G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # Restart always in production
+    restart: always
+
+    # Production logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        compress: "true"
+
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+
+    # Read-only root filesystem (except mounted volumes)
+    # Uncomment if your app supports it
+    # read_only: true
+
+    # Tmpfs for temporary files
+    tmpfs:
+      - /tmp
+      - /app/tmp
+
+# Production volumes with specific options
+volumes:
+  model-cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/qwen-models  # Change to your production path
+
+  hf-cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/hf-cache
+
+  transformers-cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/transformers-cache
+
+networks:
+  qwen-network:
+    driver: bridge

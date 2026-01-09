@@ -1,0 +1,48 @@
+version: '3.8'
+
+# Development override for docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  qwen3-vl-server:
+    # Build configuration for development
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base  # Use base stage for faster rebuilds
+
+    # Override image name
+    image: qwen3-vl-inference:dev
+    container_name: qwen3-vl-server-dev
+
+    # Enable debug mode
+    environment:
+      - DEBUG=True
+      - LOG_LEVEL=DEBUG
+
+    # Mount source code for hot reload (if using uvicorn with --reload)
+    volumes:
+      # Mount application code for development
+      - ./app:/app/app:rw
+      - ./main.py:/app/main.py:rw
+      # Model and cache volumes
+      - model-cache:/models
+      - hf-cache:/cache/huggingface
+      - transformers-cache:/cache/transformers
+      # Development logs
+      - ./logs:/app/logs
+
+    # Override command for development with auto-reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
+
+    # Interactive mode
+    stdin_open: true
+    tty: true
+
+volumes:
+  model-cache:
+  hf-cache:
+  transformers-cache:
+
+networks:
+  qwen-network:

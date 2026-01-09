@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  qwen3-vl-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: qwen3-vl-inference:latest
+    container_name: qwen3-vl-server
+
+    # GPU support - requires nvidia-docker runtime
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all  # Use all available GPUs
+              capabilities: [gpu]
+
+    # Environment variables
+    environment:
+      - MODEL_PATH=${MODEL_PATH:-Qwen/Qwen3-VL-235B-A22B-Instruct}
+      - HOST=0.0.0.0
+      - PORT=8000
+      - GPU_MEMORY_UTILIZATION=${GPU_MEMORY_UTILIZATION:-0.70}
+      - TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-}
+      - DEFAULT_MAX_TOKENS=${DEFAULT_MAX_TOKENS:-2048}
+      - DEBUG=${DEBUG:-False}
+      # HuggingFace token (optional, for gated models)
+      - HF_TOKEN=${HF_TOKEN:-}
+
+    # Ports
+    ports:
+      - "${HOST_PORT:-8000}:8000"
+
+    # Volumes
+    volumes:
+      # Model cache (persist downloaded models)
+      - model-cache:/models
+      # HuggingFace cache
+      - hf-cache:/cache/huggingface
+      # Transformers cache
+      - transformers-cache:/cache/transformers
+      # Optional: Mount local model directory
+      # - ./models:/models:ro
+      # Optional: Mount custom config
+      # - ./.env:/app/.env:ro
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Network
+    networks:
+      - qwen-network
+
+# Named volumes for persistence
+volumes:
+  model-cache:
+    driver: local
+  hf-cache:
+    driver: local
+  transformers-cache:
+    driver: local
+
+# Network
+networks:
+  qwen-network:
+    driver: bridge
