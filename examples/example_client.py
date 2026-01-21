@@ -303,6 +303,43 @@ class Qwen3VLClient:
         response.raise_for_status()
         return response.json()
 
+    def image_comparison(
+        self,
+        image_urls: list = None,
+        image_base64_list: list = None,
+        comparison_type: str = "differences",
+        output_format: str = "json",
+        prompt: str = None,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Compare multiple images (2-4) and detect differences, changes, or similarities.
+
+        Args:
+            image_urls: List of image URLs (2-4 images)
+            image_base64_list: List of base64 encoded images (2-4 images)
+            comparison_type: Type of comparison (differences, changes, similarities)
+            output_format: Output format (json, text)
+            prompt: Custom prompt for comparison
+            **kwargs: Additional parameters
+
+        Returns:
+            Response dictionary
+        """
+        data = {
+            "image_urls": image_urls,
+            "image_base64_list": image_base64_list,
+            "comparison_type": comparison_type,
+            "output_format": output_format,
+            "prompt": prompt or "",
+            **kwargs
+        }
+        data = {k: v for k, v in data.items() if v is not None}
+
+        response = requests.post(f"{self.base_url}/api/v1/image/comparison", json=data)
+        response.raise_for_status()
+        return response.json()
+
 
 def main():
     """Example usage."""
@@ -336,6 +373,19 @@ def main():
         image_url="https://example.com/document.jpg",
         include_bbox=True,
         granularity="line"
+    )
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+
+    # Example 4: Image Comparison
+    print("\n=== Image Comparison ===")
+    result = client.image_comparison(
+        image_urls=[
+            "https://example.com/image1.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image3.jpg"
+        ],
+        comparison_type="differences",
+        output_format="json"
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))
 

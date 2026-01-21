@@ -13,6 +13,7 @@
 5. **Document Parsing** - Парсинг документов в различные форматы (HTML, Markdown, JSON)
 6. **Document OCR** - Распознавание текста в документах
 7. **Wild Image OCR** - Распознавание текста на естественных изображениях
+8. **Image Comparison** - Сравнение нескольких изображений (2-4) для поиска различий, изменений или сходств
 
 ## Архитектура
 
@@ -240,6 +241,25 @@ url = "http://localhost:8000/api/v1/ocr/wild"
 data = {
     "image_url": "https://example.com/street_sign.jpg",
     "include_bbox": True
+}
+
+response = requests.post(url, json=data)
+print(response.json())
+```
+
+### 8. Image Comparison
+
+```python
+url = "http://localhost:8000/api/v1/image/comparison"
+data = {
+    "image_urls": [
+        "https://example.com/image1.jpg",
+        "https://example.com/image2.jpg",
+        "https://example.com/image3.jpg"
+    ],
+    "comparison_type": "differences",  # differences, changes, similarities
+    "output_format": "json",
+    "prompt": ""
 }
 
 response = requests.post(url, json=data)

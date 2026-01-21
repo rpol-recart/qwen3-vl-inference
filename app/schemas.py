@@ -13,6 +13,7 @@ class TaskType(str, Enum):
     DOCUMENT_PARSING = "document_parsing"
     DOCUMENT_OCR = "document_ocr"
     WILD_OCR = "wild_ocr"
+    IMAGE_COMPARISON = "image_comparison"
 
 
 class OutputFormat(str, Enum):
@@ -105,6 +106,16 @@ class OCRRequest(ImageInferenceRequest):
     output_format: OutputFormat = Field(OutputFormat.TEXT, description="Output format")
     granularity: str = Field("line", description="OCR granularity: word, line, paragraph")
     include_bbox: bool = Field(False, description="Include bounding boxes")
+
+
+class ImageComparisonRequest(InferenceRequest):
+    """Image comparison request for detecting differences between 2-4 images."""
+    image_urls: Optional[List[str]] = Field(None, description="List of image URLs (2-4 images)")
+    image_base64_list: Optional[List[str]] = Field(None, description="List of base64 encoded images (2-4 images)")
+    comparison_type: str = Field("differences", description="Type of comparison: differences, changes, similarities")
+    output_format: OutputFormat = Field(OutputFormat.JSON, description="Output format")
+    min_pixels: Optional[int] = Field(64 * 32 * 32, description="Minimum pixels for image processing")
+    max_pixels: Optional[int] = Field(2048 * 32 * 32, description="Maximum pixels for image processing")
 
 
 class InferenceResponse(BaseModel):

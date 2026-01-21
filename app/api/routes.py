@@ -11,6 +11,7 @@ from app.schemas import (
     ImageDescriptionRequest,
     DocumentParsingRequest,
     OCRRequest,
+    ImageComparisonRequest,
     InferenceResponse,
     HealthResponse,
 )
@@ -20,6 +21,7 @@ from app.services.video_service import VideoUnderstandingService
 from app.services.description_service import ImageDescriptionService
 from app.services.document_service import DocumentParsingService
 from app.services.ocr_service import OCRService
+from app.services.comparison_service import ImageComparisonService
 from app.core.inference_engine import Qwen3VLInferenceEngine
 from app.core.utils import encode_video_to_base64
 
@@ -245,3 +247,26 @@ async def wild_ocr(
     """
     service = OCRService(engine)
     return await service.perform_wild_ocr(request)
+
+
+@router.post("/v1/image/comparison", response_model=InferenceResponse)
+async def image_comparison(
+    request: ImageComparisonRequest,
+    engine: Qwen3VLInferenceEngine = Depends(get_engine),
+):
+    """
+    Compare multiple images (2-4) and detect differences or similarities.
+
+    This endpoint analyzes 2 to 4 images simultaneously to identify:
+    - Differences: Changes in objects, positions, colors, text, or visual elements
+    - Changes: Temporal changes, movements, additions, or removals
+    - Similarities: Common elements, patterns, themes, or characteristics
+
+    Supports multiple input formats:
+    - image_urls: List of image URLs (2-4 images)
+    - image_base64_list: List of base64 encoded images (2-4 images)
+
+    Returns a detailed comparison analysis in JSON or text format.
+    """
+    service = ImageComparisonService(engine)
+    return await service.perform_comparison(request)

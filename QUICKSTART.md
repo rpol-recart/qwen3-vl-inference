@@ -133,6 +133,7 @@ python examples/example_client.py
 | `POST /api/v1/document/parsing` | Парсинг документов |
 | `POST /api/v1/ocr/document` | OCR документов |
 | `POST /api/v1/ocr/wild` | OCR естественных изображений |
+| `POST /api/v1/image/comparison` | Сравнение изображений (2-4) |
 
 ## Примеры запросов
 
@@ -323,5 +324,6 @@ TENSOR_PARALLEL_SIZE=2
 ## Дополнительная информация
 
 - Полная документация: [README.md](README.md)
+- Руководство по сравнению изображений: [IMAGE_COMPARISON_GUIDE.md](IMAGE_COMPARISON_GUIDE.md)
 - Примеры использования: [examples/](examples/)
 - Swagger UI: http://localhost:8000/docs

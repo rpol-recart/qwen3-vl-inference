@@ -30,7 +30,8 @@ D:\Projects\Qwen_Vl_inference\
 │       ├── video_service.py      # Video Understanding сервис
 │       ├── description_service.py # Image Description сервис
 │       ├── document_service.py   # Document Parsing сервис
-│       └── ocr_service.py        # OCR сервис
+│       ├── ocr_service.py        # OCR сервис
+│       └── comparison_service.py # Image Comparison сервис
 │
 ├── examples/                     # Примеры использования
 │   └── example_client.py         # Python клиент
